@@ -1,0 +1,80 @@
+# config.yaml - Nimbus Edge Server Configuration File
+
+# General Server Settings
+server:
+  at_sign: "@nimbus1_01"          # The atSign for the server instance
+  root_domain: "nimbus.example.com" # Fully Qualified Domain Name for the server
+  host: "0.0.0.0"                 # Host address where the server will listen
+  port: 6464                      # Port number for the server
+
+# Paths
+paths:
+  storage_path: "./storage"       # Directory path for storage
+  commit_log_path: "./commitLog"  # Directory path for commit logs
+
+# Security Settings
+security:
+  auth_required: true             # Enable authentication for all incoming connections
+  encryption_config: "default_encryption"  # Encryption configuration settings
+  security_level: 2               # Security level (1 = Basic, 2 = Advanced with IDS/IPS)
+  cram_secret: "your_cram_secret" # Cram key used for authentication
+  email: "admin@nimbus.example.com" # Email address for SSL certificate management
+
+# Analytics and Monitoring
+analytics:
+  edge_analytics: true            # Enable or disable edge analytics
+  anomaly_threshold: 2.0          # Threshold for anomaly detection in real-time analytics
+  monitoring_interval: 30         # Interval in seconds for health checks and monitoring
+
+# Logging Settings
+logging:
+  log_level: "INFO"               # Log level (DEBUG, INFO, WARN, ERROR)
+  log_file_path: "./logs/nimbus.log" # Path for log file output
+  rotate_logs: true               # Enable log rotation
+  rotation_interval: "24h"        # Log rotation interval (e.g., 24h, 1h)
+
+# Routing Configuration
+routing:
+  default_priority: 1             # Default priority level for routing data
+  priority_map:                   # Priority map for specific devices (adjust as needed)
+    "device1": 3
+    "device2": 2
+
+# API Keys and Access Control
+api_keys:
+  ats_api_key: "dc34ac3e-00e6-4d49-a557-0e3945372ed9"  # API key for accessing atSign services
+
+access_control:
+  default_role: "guest"           # Default role for new devices
+  roles:                          # Define roles and their permissions
+    admin:
+      permissions: ["read", "write", "execute"]
+    user:
+      permissions: ["read", "write"]
+    guest:
+      permissions: ["read"]
+
+# DESS Specific Configurations
+dess:
+  enable_dess: true               # Enable DESS integration for secondary server
+  server_path: "/path/to/dess/server" # Path to the DESS server binary or Docker setup
+  server_config:                  # Additional configurations specific to DESS
+    ssl_enabled: true             # Enable SSL for secure communication
+    ssl_cert_path: "/path/to/cert.pem" # Path to SSL certificate
+    ssl_key_path: "/path/to/key.pem"   # Path to SSL key
+
+# Health Check Settings
+health_check:
+  enabled: true                   # Enable or disable health monitoring
+  check_interval: 60              # Interval in seconds for health checks
+
+# Alerting Configuration
+alerts:
+  alert_email: "alerts@nimbus.example.com" # Email for alert notifications
+  alert_threshold: 5              # Threshold for sending alerts
+
+# Backup and Recovery Settings
+backup:
+  enable_backups: true            # Enable or disable backups
+  backup_interval: "7d"           # Backup interval (e.g., daily, weekly)
+  backup_path: "./backups"        # Directory path for storing backups

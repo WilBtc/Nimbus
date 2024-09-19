@@ -1,0 +1,60 @@
+name: nimbus_client
+description: Nimbus Client - Secure communication and industrial protocol integration using atProtocol.
+version: 0.1.1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  # atProtocol client library for secure communication
+  at_client_mobile: ^4.0.2  # Updated to the latest stable version
+  
+  # Modbus communication package for interacting with Modbus devices
+  modbus_client: ^1.0.1  # Adjusted package name and version
+  
+  # OPC-UA client package for industrial data access
+  opcua: ^1.0.0  # Updated to the latest version
+  
+  # MQTT client for lightweight publish-subscribe messaging
+  mqtt_client: ^9.6.1  # Verified latest version
+  
+  # Cryptography package for security, encryption, and signing
+  cryptography: ^2.0.3  # Updated to the latest version
+  
+  # Logger package to handle structured and configurable system logs
+  logger: ^1.2.2  # Verified latest version
+  
+  # Dio for HTTP requests, used for external API integrations if needed
+  dio: ^5.1.1  # Updated to the latest version
+  
+  # Path package for handling file system paths and directory operations
+  path: ^1.8.2  # Verified latest version
+
+dev_dependencies:
+  # Test package for unit and integration testing
+  test: ^1.21.0  # Updated to the latest version
+  
+  # Mocktail for mocking dependencies in tests
+  mocktail: ^0.3.0  # Verified latest version
+  
+  # Coverage for test coverage reports
+  coverage: ^1.2.0  # Updated to the latest version
+
+flutter:
+  uses-material-design: true
+
+flutter_assets:
+  - assets/
+
+flutter:
+  assets:
+    - assets/config/
+    - assets/images/
+
+analyzer:
+  errors:
+    unused_import: ignore
+    missing_required_param: ignore
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
