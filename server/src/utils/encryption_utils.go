@@ -48,7 +48,7 @@ func SavePrivateKey(privateKey *rsa.PrivateKey, filename string) error {
 		Type:  "RSA PRIVATE KEY",
 		Bytes: keyBytes,
 	}
-	file, err := os.Create(filename)
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return fmt.Errorf("failed to create private key file: %w", err)
 	}
@@ -71,7 +71,7 @@ func SavePublicKey(publicKey *rsa.PublicKey, filename string) error {
 		Type:  "PUBLIC KEY",
 		Bytes: keyBytes,
 	}
-	file, err := os.Create(filename)
+	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
 		return fmt.Errorf("failed to create public key file: %w", err)
 	}
@@ -87,7 +87,7 @@ func SavePublicKey(publicKey *rsa.PublicKey, filename string) error {
 // SignData creates a digital signature for the given data using the provided RSA private key and SHA-512 hashing.
 func SignData(privateKey *rsa.PrivateKey, data []byte) ([]byte, error) {
 	hashed := sha512.Sum512(data)
-	signature, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA512, hashed[:])
+	signature, err := rsa.SignPSS(rand.Reader, privateKey, crypto.SHA512, hashed[:], nil)
 	if err != nil {
 		return nil, fmt.Errorf("signing failed: %w", err)
 	}
@@ -97,7 +97,7 @@ func SignData(privateKey *rsa.PrivateKey, data []byte) ([]byte, error) {
 // VerifySignature verifies a digital signature using the provided RSA public key and SHA-512 hashing.
 func VerifySignature(publicKey *rsa.PublicKey, data, signature []byte) error {
 	hashed := sha512.Sum512(data)
-	err := rsa.VerifyPKCS1v15(publicKey, crypto.SHA512, hashed[:], signature)
+	err := rsa.VerifyPSS(publicKey, crypto.SHA512, hashed[:], signature, nil)
 	if err != nil {
 		return fmt.Errorf("signature verification failed: %w", err)
 	}

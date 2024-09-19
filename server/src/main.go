@@ -1,14 +1,12 @@
-// src/main.go
+// server/src/main.go
 
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"server/core"
 	"server/modules"
@@ -23,83 +21,65 @@ func main() {
 	}
 
 	// Initialize logger
-	logger := utils.NewLogger(config.LogLevel)
+	logger := utils.NewLogger(config.LogLevel, config.LogFilePath, config.RotateLogs, config.RotationInterval)
+	defer logger.Close()
 
 	// Initialize Security Gateway
 	securityGateway := core.NewSecurityGateway(config)
-	err = securityGateway.Initialize()
-	if err != nil {
+	if err := securityGateway.Initialize(); err != nil {
 		logger.Error("Error initializing Security Gateway:", err)
 		return
 	}
 
 	// Initialize DESS (Distributed Edge Secondary Server)
-	dessServer := core.NewDessServer(config)
-	err = dessServer.Start()
-	if err != nil {
+	dessServer := core.NewAtSecondaryServer(config, securityGateway)
+	if err := dessServer.Start(); err != nil {
 		logger.Error("Failed to start DESS server:", err)
 		return
 	}
+	defer dessServer.Stop()
 
-	// Initialize Analytics Engine for real-time data analysis
-	analyticsEngine := modules.NewAnalyticsEngine(config)
-	err = analyticsEngine.Start()
-	if err != nil {
-		logger.Error("Failed to start Analytics Engine:", err)
-		return
-	}
+	// Initialize Access Control
+	accessControl := modules.NewAccessControl(log.Default(), dessServer.Server())
+	// Additional initialization if needed
 
-	// Initialize Routing Manager for managing data flows and decision logic
-	routingManager := modules.NewRoutingManager(config)
-	err = routingManager.Start()
-	if err != nil {
-		logger.Error("Failed to start Routing Manager:", err)
-		return
-	}
-
-	// Initialize Access Control for managing permissions and secure access
-	accessControl := modules.NewAccessControl(config)
-	err = accessControl.Initialize()
-	if err != nil {
-		logger.Error("Failed to initialize Access Control:", err)
-		return
-	}
+	// Initialize Analytics Engine
+	analyticsEngine := modules.NewAnalyticsEngine(config.AnomalyThreshold, log.Default(), func(msg string) {
+		// Handle alerts (e.g., send email or log)
+		logger.Warn(msg)
+	}, dessServer.Server())
+	analyticsEngine.StartProcessing(config.AnalyticsInterval)
 
 	// Setup signal handling for graceful shutdown
-	setupSignalHandler(dessServer, analyticsEngine, routingManager, logger)
+	setupSignalHandler(dessServer, securityGateway, analyticsEngine, logger)
 
-	logger.Info("NimBus Edge Server is running...")
+	logger.Info("Nimbus Edge Server is running...")
 
 	// Keep the server running indefinitely
 	select {}
 }
 
-// setupSignalHandler handles graceful shutdown of server components
-func setupSignalHandler(dessServer *core.DessServer, analyticsEngine *modules.AnalyticsEngine, routingManager *modules.RoutingManager, logger *utils.Logger) {
+func setupSignalHandler(dessServer *core.AtSecondaryServer, securityGateway *core.SecurityGateway, analyticsEngine *modules.AnalyticsEngine, logger *utils.Logger) {
 	// Capture OS signals for termination
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-sigs
-		logger.Info("Shutdown signal received. Shutting down NimBus Edge Server...")
+		logger.Info("Shutdown signal received. Shutting down Nimbus Edge Server...")
+
+		// Stop Analytics Engine
+		analyticsEngine.Stop()
+
+		// Stop Security Gateway
+		securityGateway.Stop()
 
 		// Stop DESS server
 		if err := dessServer.Stop(); err != nil {
 			logger.Error("Error stopping DESS server:", err)
 		}
 
-		// Stop Analytics Engine
-		if err := analyticsEngine.Stop(); err != nil {
-			logger.Error("Error stopping Analytics Engine:", err)
-		}
-
-		// Stop Routing Manager
-		if err := routingManager.Stop(); err != nil {
-			logger.Error("Error stopping Routing Manager:", err)
-		}
-
-		logger.Info("NimBus Edge Server shutdown complete.")
+		logger.Info("Nimbus Edge Server shutdown complete.")
 		os.Exit(0)
 	}()
 }

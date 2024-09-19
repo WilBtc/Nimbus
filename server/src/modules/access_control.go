@@ -1,4 +1,4 @@
-// src/modules/access_control.go
+// server/src/modules/access_control.go
 
 package modules
 
@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/atsign-foundation/dess/server" // Importing DESS server package
+	"github.com/atsign-foundation/at_server/server" // Assuming this is the correct import path for DESS server package
 )
 
 // Role represents different levels of access permissions
@@ -23,8 +23,7 @@ const (
 
 // AccessControl manages permissions, roles, and secure access to the server.
 type AccessControl struct {
-	permissions    map[string]Role      // Stores access permissions for devices with associated roles
-	permMutex      sync.RWMutex         // Read-write mutex for handling concurrent access to permissions
+	permissions    sync.Map             // Stores access permissions for devices with associated roles
 	logger         *log.Logger          // Logger for recording access control activities
 	auditLog       []AccessEvent        // Stores audit logs for access events
 	auditMutex     sync.Mutex           // Mutex for concurrent access to audit logs
@@ -39,10 +38,8 @@ type AccessEvent struct {
 	Role      Role
 }
 
-// NewAccessControl creates a new AccessControl instance integrated with DESS.
 func NewAccessControl(logger *log.Logger, dessServer *server.AtServer) *AccessControl {
 	return &AccessControl{
-		permissions: make(map[string]Role),
 		logger:      logger,
 		auditLog:    make([]AccessEvent, 0),
 		dessServer:  dessServer, // Integrate DESS server instance
@@ -51,29 +48,20 @@ func NewAccessControl(logger *log.Logger, dessServer *server.AtServer) *AccessCo
 
 // GrantAccess grants access to a specific device ID with a specified role.
 func (ac *AccessControl) GrantAccess(deviceID string, role Role) {
-	ac.permMutex.Lock()
-	defer ac.permMutex.Unlock()
-	ac.permissions[deviceID] = role
+	ac.permissions.Store(deviceID, role)
 	ac.logger.Printf("Access granted to device %s with role %s\n", deviceID, role)
 	ac.logAccessEvent(deviceID, "granted access", role)
 }
 
 // RevokeAccess revokes access for a specific device ID.
 func (ac *AccessControl) RevokeAccess(deviceID string) {
-	ac.permMutex.Lock()
-	defer ac.permMutex.Unlock()
-	role := ac.permissions[deviceID]
-	delete(ac.permissions, deviceID)
+	ac.permissions.Delete(deviceID)
 	ac.logger.Printf("Access revoked for device %s\n", deviceID)
-	ac.logAccessEvent(deviceID, "revoked access", role)
+	ac.logAccessEvent(deviceID, "revoked access", NoAccess)
 }
 
 // CheckAccess checks if a device has permission to access the server based on role.
-// Validates against DESS server's authentication.
 func (ac *AccessControl) CheckAccess(deviceID string, requiredRole Role) bool {
-	ac.permMutex.RLock()
-	defer ac.permMutex.RUnlock()
-
 	// Check if the device is authenticated with the DESS server
 	if !ac.dessServer.IsAuthenticated(deviceID) {
 		ac.logger.Printf("Access denied for unauthenticated device %s\n", deviceID)
@@ -81,13 +69,14 @@ func (ac *AccessControl) CheckAccess(deviceID string, requiredRole Role) bool {
 		return false
 	}
 
-	// Check permissions against assigned role
-	role, exists := ac.permissions[deviceID]
-	if !exists || role == NoAccess {
-		ac.logger.Printf("Access denied for device %s\n", deviceID)
+	// Retrieve the role from the permissions map
+	value, ok := ac.permissions.Load(deviceID)
+	if !ok {
+		ac.logger.Printf("Access denied for device %s: No role assigned\n", deviceID)
 		ac.logAccessEvent(deviceID, "access denied", NoAccess)
 		return false
 	}
+	role := value.(Role)
 
 	if !ac.roleSufficient(role, requiredRole) {
 		ac.logger.Printf("Insufficient permissions for device %s. Required role: %s, current role: %s\n", deviceID, requiredRole, role)
@@ -98,13 +87,6 @@ func (ac *AccessControl) CheckAccess(deviceID string, requiredRole Role) bool {
 	ac.logger.Printf("Access granted to device %s with role %s\n", deviceID, role)
 	ac.logAccessEvent(deviceID, "access granted", role)
 	return true
-}
-
-// LogUnauthorizedAccess logs an attempt to access the server without permission.
-func (ac *AccessControl) LogUnauthorizedAccess(deviceID string) {
-	ac.logger.Printf("Unauthorized access attempt by device %s\n", deviceID)
-	fmt.Printf("Unauthorized access attempt detected for device: %s\n", deviceID)
-	ac.logAccessEvent(deviceID, "unauthorized access", NoAccess)
 }
 
 // roleSufficient checks if the current role has sufficient permissions compared to the required role

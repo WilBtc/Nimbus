@@ -4,28 +4,29 @@ package core
 
 import (
 	"context"
-	"errors"
+	"crypto/tls"
 	"fmt"
-	"server/utils"
+	"net"
 	"time"
+
+	"server/utils"
 )
 
 // SecurityGateway manages security features such as encryption, traffic inspection, and anomaly detection
 type SecurityGateway struct {
 	config           *Config
 	logger           *utils.Logger
-	encryptionEngine *EncryptionEngine // Placeholder for an encryption engine if needed
-	idsEnabled       bool              // Flag to enable or disable IDS/IPS
+	tlsConfig        *tls.Config
+	idsEnabled       bool // Flag to enable or disable IDS/IPS
 	ctx              context.Context
 	cancel           context.CancelFunc
 }
 
-// NewSecurityGateway initializes a new instance of SecurityGateway
 func NewSecurityGateway(config *Config) *SecurityGateway {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &SecurityGateway{
 		config: config,
-		logger: utils.NewLogger(config.LogLevel, "", false, 0), // Adjust logger initialization as per new Logger requirements
+		logger: utils.NewLogger(config.LogLevel, config.LogFilePath, config.RotateLogs, config.RotationInterval),
 		ctx:    ctx,
 		cancel: cancel,
 	}
@@ -41,14 +42,12 @@ func (s *SecurityGateway) Initialize() error {
 		return err
 	}
 
-	// Initialize encryption engine if configured
-	if s.config.EncryptionConfig != "none" {
-		if err := s.initEncryptionEngine(); err != nil {
-			s.logger.Error("Failed to initialize encryption engine:", err)
-			return err
-		}
-		s.logger.Info("Encryption engine initialized with configuration:", s.config.EncryptionConfig)
+	// Initialize TLS configuration
+	if err := s.initTLSConfig(); err != nil {
+		s.logger.Error("Failed to initialize TLS configuration:", err)
+		return err
 	}
+	s.logger.Info("TLS configuration initialized successfully.")
 
 	// Enable advanced security features if security level is high
 	if s.config.SecurityLevel > 1 {
@@ -66,30 +65,33 @@ func (s *SecurityGateway) Initialize() error {
 
 // validateConfig checks the security configuration for potential issues
 func (s *SecurityGateway) validateConfig() error {
-	if s.config.EncryptionConfig == "" {
-		return errors.New("encryption configuration is missing")
-	}
 	if s.config.SecurityLevel < 1 {
-		return errors.New("invalid security level, must be >= 1")
+		return fmt.Errorf("invalid security level, must be >= 1")
 	}
 	return nil
 }
 
-// initEncryptionEngine initializes the encryption engine based on the provided configuration
-func (s *SecurityGateway) initEncryptionEngine() error {
-	// Placeholder for encryption initialization, adjust with actual implementation
-	s.encryptionEngine = NewEncryptionEngine(s.config.EncryptionConfig) // Replace with actual encryption engine initialization
-	if s.encryptionEngine == nil {
-		return errors.New("failed to initialize encryption engine: invalid configuration")
+// initTLSConfig initializes the TLS configuration for secure communication
+func (s *SecurityGateway) initTLSConfig() error {
+	cert, err := tls.LoadX509KeyPair(s.config.SSLCertPath, s.config.SSLKeyPath)
+	if err != nil {
+		return fmt.Errorf("failed to load SSL certificates: %w", err)
 	}
+
+	s.tlsConfig = &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		MinVersion:   tls.VersionTLS12,
+	}
+
 	return nil
 }
 
 // setupIntrusionDetection sets up intrusion detection and prevention systems
 func (s *SecurityGateway) setupIntrusionDetection() error {
-	// Placeholder for IDS/IPS setup; replace with actual integration code
+	// Placeholder for IDS/IPS setup
+	// Integrate with actual IDS solutions like Suricata or Snort
 	s.logger.Info("Setting up Intrusion Detection and Prevention System (IDS/IPS)...")
-	// Example: Integrate with third-party IDS/IPS or custom logic
+	// Example: Initialize IDS monitoring here
 	return nil
 }
 
@@ -124,7 +126,7 @@ func (s *SecurityGateway) MonitorTraffic() {
 func (s *SecurityGateway) checkForAnomalies() []string {
 	// Placeholder function, replace with actual anomaly detection logic
 	// Simulate detection of traffic anomalies for demonstration
-	return []string{"Suspicious packet detected", "Potential DDoS activity"}
+	return []string{}
 }
 
 // takeActionOnAnomalies handles actions based on detected traffic anomalies
@@ -136,12 +138,18 @@ func (s *SecurityGateway) takeActionOnAnomalies(anomalies []string) {
 	}
 }
 
+// SecureListener returns a secure listener using TLS
+func (s *SecurityGateway) SecureListener(address string) (net.Listener, error) {
+	listener, err := tls.Listen("tcp", address, s.tlsConfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create TLS listener: %w", err)
+	}
+	return listener, nil
+}
+
 // Stop gracefully stops the traffic monitoring and shuts down security processes
 func (s *SecurityGateway) Stop() {
 	s.logger.Info("Stopping Security Gateway...")
 	s.cancel() // Cancel the context to stop all monitoring activities
-	if s.encryptionEngine != nil {
-		// Optional: Shut down or clean up encryption engine resources if applicable
-	}
 	s.logger.Info("Security Gateway stopped successfully.")
 }

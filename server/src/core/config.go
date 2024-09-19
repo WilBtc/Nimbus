@@ -1,3 +1,5 @@
+// server/src/core/config.go
+
 package core
 
 import (
@@ -19,15 +21,19 @@ type Config struct {
 	StoragePath      string
 	CommitLogPath    string
 	LogLevel         string
+	LogFilePath      string
+	RotateLogs       bool
+	RotationInterval int
 	AuthRequired     bool
 	EncryptionConfig string // Placeholder for specific encryption settings, adjust based on DESS requirements
 	SecurityLevel    int
 	EdgeAnalytics    bool
 	Secret           string // Secret used for cram authentication to the secondary
 	Email            string // Email address for SSL certificate management
+	SSLCertPath      string // Path to SSL certificate
+	SSLKeyPath       string // Path to SSL key
 }
 
-// LoadConfig loads configuration from environment variables with defaults
 func LoadConfig() (*Config, error) {
 	config := &Config{
 		AtSign:           getEnv("ATSIGN", ""),
@@ -38,12 +44,17 @@ func LoadConfig() (*Config, error) {
 		StoragePath:      getEnv("STORAGE_PATH", "./storage"),
 		CommitLogPath:    getEnv("COMMIT_LOG_PATH", "./commitLog"),
 		LogLevel:         getEnv("LOG_LEVEL", "INFO"),
+		LogFilePath:      getEnv("LOG_FILE_PATH", "./logs/nimbus.log"),
+		RotateLogs:       getEnvAsBool("ROTATE_LOGS", true),
+		RotationInterval: getEnvAsInt("ROTATION_INTERVAL", 24), // in hours
 		AuthRequired:     getEnvAsBool("AUTH_REQUIRED", true),
 		EncryptionConfig: getEnv("ENCRYPTION_CONFIG", "default_encryption"),
 		SecurityLevel:    getEnvAsInt("SECURITY_LEVEL", 2),
 		EdgeAnalytics:    getEnvAsBool("EDGE_ANALYTICS", true),
-		Secret:           getEnvSecure("CRAM_SECRET", ""), // Securely handle secrets
-		Email:            getEnv("EMAIL", ""),             // Email for SSL certificate requests
+		Secret:           getEnvSecure("SECRET", ""), // Securely handle secrets
+		Email:            getEnv("EMAIL", ""),        // Email for SSL certificate requests
+		SSLCertPath:      getEnv("SSL_CERT_PATH", ""),// Path to SSL certificate
+		SSLKeyPath:       getEnv("SSL_KEY_PATH", ""), // Path to SSL key
 	}
 
 	// Perform validation on loaded configuration
@@ -54,9 +65,8 @@ func LoadConfig() (*Config, error) {
 	return config, nil
 }
 
-// validateConfig performs validation on the loaded configuration
 func validateConfig(config *Config) error {
-	// Ensure all required DESS-specific configurations are set
+	// Ensure all required configurations are set
 	if config.AtSign == "" {
 		return errors.New("ATSIGN is required but not set in the environment variables")
 	}
@@ -65,6 +75,9 @@ func validateConfig(config *Config) error {
 	}
 	if config.Email == "" {
 		return errors.New("EMAIL is required for SSL management but not set in the environment variables")
+	}
+	if config.SSLCertPath == "" || config.SSLKeyPath == "" {
+		return errors.New("SSL_CERT_PATH and SSL_KEY_PATH are required for TLS but not set")
 	}
 
 	// Validate email format
@@ -89,17 +102,15 @@ func validateConfig(config *Config) error {
 	return nil
 }
 
-// ensurePathExists checks if a directory exists and creates it if it does not
 func ensurePathExists(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if err := os.MkdirAll(path, 0755); err != nil {
+		if err := os.MkdirAll(path, 0750); err != nil {
 			return fmt.Errorf("failed to create path %s: %w", path, err)
 		}
 	}
 	return nil
 }
 
-// getEnv retrieves environment variables or returns a default value if not set
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -107,7 +118,6 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
-// getEnvSecure retrieves sensitive environment variables securely
 func getEnvSecure(key, defaultValue string) string {
 	value := getEnv(key, defaultValue)
 	if value == "" && defaultValue == "" {
@@ -116,7 +126,6 @@ func getEnvSecure(key, defaultValue string) string {
 	return value
 }
 
-// getEnvAsInt retrieves an environment variable as an integer, with a fallback to a default value
 func getEnvAsInt(name string, defaultVal int) int {
 	valueStr := getEnv(name, "")
 	if value, err := strconv.Atoi(valueStr); err == nil {
@@ -125,7 +134,6 @@ func getEnvAsInt(name string, defaultVal int) int {
 	return defaultVal
 }
 
-// getEnvAsBool retrieves an environment variable as a boolean, with a fallback to a default value
 func getEnvAsBool(name string, defaultVal bool) bool {
 	valStr := getEnv(name, "")
 	if val, err := strconv.ParseBool(valStr); err == nil {
@@ -134,9 +142,8 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 	return defaultVal
 }
 
-// isValidEmail validates the email address format using regex
 func isValidEmail(email string) bool {
 	// Basic email validation regex pattern
-	re := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)
 	return re.MatchString(email)
 }
