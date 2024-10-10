@@ -1,5 +1,4 @@
 // server/src/modules/analytics_engine.go
-
 package modules
 
 import (
@@ -9,19 +8,20 @@ import (
 	"sync"
 	"time"
 
-	"github.com/atsign-foundation/at_server/server"
+	"github.com/atsign-foundation/at_server/server" // Assuming this is the correct import path for DESS server package
 )
 
 // AnalyticsEngine handles real-time data processing, analytics, and anomaly detection.
 type AnalyticsEngine struct {
-	dataMutex        sync.Mutex
-	dataStore        []float64          // Stores incoming data for processing
-	anomalyThreshold float64            // Threshold for Z-score anomaly detection
-	logger           *log.Logger        // Logger for tracking analytics events
-	alertHandler     func(string)       // Handler function for sending alerts
-	dessServer       *server.AtServer   // Reference to the DESS server for extended security and logging
+	dataMutex        sync.Mutex        // Mutex for thread-safe access to data
+	dataStore        []float64         // Stores incoming data for processing
+	anomalyThreshold float64           // Threshold for Z-score anomaly detection
+	logger           *log.Logger       // Logger for tracking analytics events
+	alertHandler     func(string)      // Handler function for sending alerts
+	dessServer       *server.AtServer  // Reference to the DESS server for extended security and logging
 }
 
+// NewAnalyticsEngine initializes a new AnalyticsEngine with an anomaly threshold, logger, alert handler, and DESS server integration.
 func NewAnalyticsEngine(anomalyThreshold float64, logger *log.Logger, alertHandler func(string), dessServer *server.AtServer) *AnalyticsEngine {
 	return &AnalyticsEngine{
 		dataStore:        make([]float64, 0),
@@ -32,13 +32,15 @@ func NewAnalyticsEngine(anomalyThreshold float64, logger *log.Logger, alertHandl
 	}
 }
 
+// AddData appends new data to the internal store, ensuring thread-safety with a mutex.
 func (ae *AnalyticsEngine) AddData(data float64) {
 	ae.dataMutex.Lock()
 	defer ae.dataMutex.Unlock()
 	ae.dataStore = append(ae.dataStore, data)
-	ae.logger.Printf("Data added: %v\n", data)
+	ae.logger.Printf("Data added: %.2f\n", data)
 }
 
+// ProcessData processes the stored data to calculate mean and standard deviation, and checks for anomalies.
 func (ae *AnalyticsEngine) ProcessData() {
 	ae.dataMutex.Lock()
 	defer ae.dataMutex.Unlock()
@@ -60,6 +62,7 @@ func (ae *AnalyticsEngine) ProcessData() {
 	ae.dataStore = ae.dataStore[:0]
 }
 
+// calculateMean calculates the average of the data points in the store.
 func (ae *AnalyticsEngine) calculateMean() float64 {
 	sum := 0.0
 	for _, value := range ae.dataStore {
@@ -68,6 +71,7 @@ func (ae *AnalyticsEngine) calculateMean() float64 {
 	return sum / float64(len(ae.dataStore))
 }
 
+// calculateStdDev calculates the standard deviation of the data points based on the provided mean.
 func (ae *AnalyticsEngine) calculateStdDev(mean float64) float64 {
 	varianceSum := 0.0
 	for _, value := range ae.dataStore {
@@ -76,6 +80,7 @@ func (ae *AnalyticsEngine) calculateStdDev(mean float64) float64 {
 	return math.Sqrt(varianceSum / float64(len(ae.dataStore)))
 }
 
+// detectAnomalies identifies data points that exceed the anomaly threshold using the Z-score method.
 func (ae *AnalyticsEngine) detectAnomalies(mean, stdDev float64) {
 	for _, value := range ae.dataStore {
 		zScore := math.Abs((value - mean) / stdDev)
@@ -87,7 +92,9 @@ func (ae *AnalyticsEngine) detectAnomalies(mean, stdDev float64) {
 	}
 }
 
+// handleAnomaly handles detected anomalies by logging them, sending alerts, and optionally logging events to DESS.
 func (ae *AnalyticsEngine) handleAnomaly(message string) {
+	// Send an alert if an alert handler is provided
 	if ae.alertHandler != nil {
 		ae.alertHandler(message)
 	}
@@ -99,6 +106,7 @@ func (ae *AnalyticsEngine) handleAnomaly(message string) {
 	}
 }
 
+// StartProcessing starts a ticker that processes data at regular intervals.
 func (ae *AnalyticsEngine) StartProcessing(interval time.Duration) {
 	ticker := time.NewTicker(interval)
 	go func() {
@@ -108,6 +116,7 @@ func (ae *AnalyticsEngine) StartProcessing(interval time.Duration) {
 	}()
 }
 
+// Stop stops the analytics engine by logging the stop event. Cleanup actions can be added if necessary.
 func (ae *AnalyticsEngine) Stop() {
 	ae.logger.Println("Stopping Analytics Engine...")
 	// Implement any cleanup if necessary

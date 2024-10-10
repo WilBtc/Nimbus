@@ -22,6 +22,7 @@ type SecurityGateway struct {
 	cancel           context.CancelFunc
 }
 
+// NewSecurityGateway initializes a new SecurityGateway with the given configuration
 func NewSecurityGateway(config *Config) *SecurityGateway {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &SecurityGateway{
@@ -32,24 +33,24 @@ func NewSecurityGateway(config *Config) *SecurityGateway {
 	}
 }
 
-// Initialize sets up the security gateway with the necessary security measures
+// Initialize sets up the Security Gateway with necessary security measures
 func (s *SecurityGateway) Initialize() error {
 	s.logger.Info("Initializing Security Gateway...")
 
-	// Validate configuration before initializing security components
+	// Validate security configuration
 	if err := s.validateConfig(); err != nil {
 		s.logger.Error("Security configuration validation failed:", err)
 		return err
 	}
 
-	// Initialize TLS configuration
+	// Initialize TLS configuration for secure communication
 	if err := s.initTLSConfig(); err != nil {
 		s.logger.Error("Failed to initialize TLS configuration:", err)
 		return err
 	}
 	s.logger.Info("TLS configuration initialized successfully.")
 
-	// Enable advanced security features if security level is high
+	// Enable advanced security features if security level requires it
 	if s.config.SecurityLevel > 1 {
 		s.logger.Info("Advanced security enabled: Traffic inspection and anomaly detection activated.")
 		if err := s.setupIntrusionDetection(); err != nil {
@@ -63,10 +64,13 @@ func (s *SecurityGateway) Initialize() error {
 	return nil
 }
 
-// validateConfig checks the security configuration for potential issues
+// validateConfig checks that the security configuration is valid
 func (s *SecurityGateway) validateConfig() error {
 	if s.config.SecurityLevel < 1 {
 		return fmt.Errorf("invalid security level, must be >= 1")
+	}
+	if s.config.SSLCertPath == "" || s.config.SSLKeyPath == "" {
+		return fmt.Errorf("SSL certificate and key paths are required but not set")
 	}
 	return nil
 }
@@ -80,18 +84,16 @@ func (s *SecurityGateway) initTLSConfig() error {
 
 	s.tlsConfig = &tls.Config{
 		Certificates: []tls.Certificate{cert},
-		MinVersion:   tls.VersionTLS12,
+		MinVersion:   tls.VersionTLS12, // Ensuring strong TLS encryption
 	}
 
 	return nil
 }
 
-// setupIntrusionDetection sets up intrusion detection and prevention systems
+// setupIntrusionDetection sets up the intrusion detection and prevention system (IDS/IPS)
 func (s *SecurityGateway) setupIntrusionDetection() error {
-	// Placeholder for IDS/IPS setup
-	// Integrate with actual IDS solutions like Suricata or Snort
 	s.logger.Info("Setting up Intrusion Detection and Prevention System (IDS/IPS)...")
-	// Example: Initialize IDS monitoring here
+	// Placeholder for integrating with actual IDS solutions like Suricata or Snort
 	return nil
 }
 
@@ -99,7 +101,7 @@ func (s *SecurityGateway) setupIntrusionDetection() error {
 func (s *SecurityGateway) MonitorTraffic() {
 	s.logger.Info("Starting traffic monitoring...")
 
-	// Simulated continuous monitoring loop using context for graceful shutdown
+	// Monitoring loop with graceful shutdown using context
 	ticker := time.NewTicker(10 * time.Second) // Adjust monitoring interval as needed
 	defer ticker.Stop()
 
@@ -138,7 +140,7 @@ func (s *SecurityGateway) takeActionOnAnomalies(anomalies []string) {
 	}
 }
 
-// SecureListener returns a secure listener using TLS
+// SecureListener returns a secure listener using TLS for encrypted communication
 func (s *SecurityGateway) SecureListener(address string) (net.Listener, error) {
 	listener, err := tls.Listen("tcp", address, s.tlsConfig)
 	if err != nil {

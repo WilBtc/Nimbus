@@ -1,0 +1,157 @@
+**Nimbus Pitch Deck for Investors & Industrial Clients**
+
+---
+
+**Slide 1: Introduction**
+
+- **Title:** **Nimbus: Revolutionizing Industrial IoT with Decentralized Edge Intelligence**
+- **Subtitle:** Enabling Secure, Real-Time Automation with Cutting-Edge Technologies
+- **Key Points:**
+  - Nimbus transforms industrial operations by seamlessly integrating decentralized, edge-based AI and secure communication.
+  - Built on atSign DESS, Red Hat Edge, Hypercore, and more, Nimbus offers a robust, efficient solution for Industry 4.0.
+  - **Opportunity:** Tap into the growing industrial IoT market projected to reach $263 billion by 2027.
+
+- **Visual:** Dynamic background showcasing a connected industrial ecosystem.
+
+---
+
+**Slide 2: Problem Statement**
+
+- **Title:** **Challenges Facing Industrial IoT Today**
+- **Key Points:**
+  - **Security Vulnerabilities:** Traditional systems expose open ports, making them susceptible to cyberattacks.
+  - **Operational Downtime:** Frequent system upgrades require production halts, affecting profitability.
+  - **High Latency & Centralization:** Centralized data processing leads to slow response times and limits scalability.
+  - **Market Pressure:** Industries are expected to become "smarter" while maintaining stringent security standards.
+
+- **Visual:** Problem matrix depicting the challenges of traditional IoT solutions: Downtime, Security Risks, Centralization.
+
+---
+
+**Slide 3: Our Solution**
+
+- **Title:** **Nimbus: A Secure, Decentralized, & Scalable Industrial IoT Platform**
+- **Key Points:**
+  - **End-to-End Security:** No open ports, no attack surface; leveraging atSign's DESS and Red Hat Edge OS.
+  - **Edge AI Processing:** Local AI using **Red Hat OpenShift Edge Linux OS**, enabling real-time decision-making.
+  - **Seamless, No-Downtime Upgrades:** Perform software updates without disrupting production.
+  - **Decentralized Architecture:** Utilizing **Hypercore**, **Hyperworm**, and **Autobase** for efficient, distributed data handling with redundancy.
+
+- **Visual:** Flowchart showing Nimbus architecture—Edge Server, AI processing, decentralized data layers.
+
+---
+
+**Slide 4: Key Differentiators**
+
+- **Title:** **Why Nimbus Outperforms Traditional Solutions**
+- **Key Points:**
+  - **Redundant, Multi-Layer Security:** Combining DESS, Hypercore immutability, and NoPorts technology.
+  - **Low Latency:** Decentralized architecture means faster, more efficient data processing and device communication.
+  - **Scalability with Cost Efficiency:** Effortlessly scale without expensive centralized infrastructure.
+  - **Legacy & Modern Integration:** Seamlessly integrates with both legacy (Modbus, OPC-UA) and modern protocols (MQTT).
+
+- **Visual:** Comparative infographic—Nimbus vs traditional solutions, emphasizing speed, security, and scalability.
+
+---
+
+**Slide 5: System Architecture**
+
+- **Title:** **How It Works**
+- **Key Points:**
+  - **Integration Flexibility:** Connects to legacy and modern industrial systems with ease.
+  - **Edge Processing:** AI at the edge ensures real-time analytics without cloud dependencies.
+  - **Redundancy & Reliability:** Data distributed through **Hypercore** for efficiency and redundancy.
+
+- **Visual:** System architecture diagram showing integration with diverse industrial environments and seamless cloud-edge interaction.
+
+---
+
+**Slide 6: Real-World Use Cases**
+
+- **Title:** **Nimbus in Action: Proven Industrial Applications**
+- **Use Case 1:** **Manufacturing Automation**
+  - Edge AI monitors production lines in real-time, predicting maintenance needs and reducing downtime.
+  - **Result:** 20% reduction in operational costs.
+- **Use Case 2:** **Energy & Utilities**
+  - Nimbus ensures secure communication for remote monitoring of power stations, reducing site visits.
+  - **Result:** Increased efficiency and lowered maintenance costs.
+- **Use Case 3:** **Smart Infrastructure**
+  - Low-latency control over smart city infrastructure, like lighting, traffic systems, and public utilities.
+  - **Result:** 30% improvement in city services efficiency.
+
+- **Visual:** Photos and data overlays for different industries—factories, power plants, smart cities.
+
+---
+
+**Slide 7: Market Opportunity**
+
+- **Title:** **Capitalizing on Industry 4.0 Trends**
+- **Key Points:**
+  - **IoT Market Growth:** Expected to reach $263 billion by 2027, with a major focus on industrial use.
+  - **Edge Computing Surge:** Increasing demand for real-time data processing at the edge for mission-critical operations.
+  - **Rising Security Concerns:** 70% of industrial players list cybersecurity as their top challenge—Nimbus solves this.
+
+- **Visual:** Market opportunity graph showing IoT and edge computing growth trends.
+
+---
+
+**Slide 8: Financial Projections & ROI**
+
+- **Title:** **Investment & Growth Projections**
+- **Key Points:**
+  - **Rapid Market Entry:** Early partnerships with manufacturers and smart city developers, projected $5M in revenue in Year 1.
+  - **Scalable Business Model:** Subscription-based edge AI processing and security services.
+  - **ROI:** Estimated 150% ROI within 3 years, driven by operational cost savings and SaaS scalability.
+
+- **Visual:** Revenue growth chart, projected ROI timeline.
+
+---
+
+**Slide 9: Competitive Analysis**
+
+- **Title:** **Nimbus vs. Competitors**
+- **Key Points:**
+  - **Security:** Unlike traditional cloud-based systems, Nimbus has no open ports, eliminating attack surfaces.
+  - **Flexibility:** Integrates seamlessly with both legacy systems and new tech, while competitors often focus only on modern infrastructure.
+  - **Scalable AI:** AI capabilities are brought to the edge, reducing costs and increasing efficiency compared to centralized processing.
+
+- **Visual:** Table comparing Nimbus features vs. key competitors (security, scalability, integration).
+
+---
+
+**Slide 10: The Team**
+
+- **Title:** **Meet Our Experts**
+- **Key Points:**
+  - **Wil Franco** – CTO & Chief Developer: Expert in automation, decentralized technologies, and industrial IoT.
+  - **Industry Advisors** – Professionals with years of experience in industrial automation and smart city tech.
+  - **Technical Partners** – Red Hat, Hypercore contributors, atSign DESS specialists.
+
+- **Visual:** Team photos, roles, and industry expertise.
+
+---
+
+**Slide 11: Call to Action**
+
+- **Title:** **Join Us in Shaping the Future of Industrial IoT**
+- **Key Points:**
+  - **Invest in a secure and scalable IoT future**: Take advantage of Nimbus's unique position in a rapidly growing market.
+  - **Partner with us**: Pilot Nimbus in your operations and experience the power of real-time, decentralized IoT.
+
+- **Contact Information:**
+  - **Email:** **w.aroca@insaing.com**
+  - **Website:** **nimbus-iot.com**
+  - **Phone:** **+1 123-456-7890**
+
+- **Visual:** Nimbus logo with tagline: "Connecting Industry Securely."
+
+---
+
+**Visual Enhancements Summary**
+
+1. **Slide 5 Visual**: Flowchart of Nimbus working in various environments (e.g., factory, energy grid, city infrastructure).
+2. **Slide 7 Visual**: Market opportunity graph showing growth projections for edge computing and IoT.
+3. **Slide 8 Visual**: Revenue growth chart showing Nimbus's business potential.
+4. **Slide 9 Visual**: Comparative table showing Nimbus's edge over competitors.
+
+

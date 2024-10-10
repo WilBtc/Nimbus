@@ -2,6 +2,7 @@
 import 'package:cryptography/cryptography.dart';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'logging_service.dart'; // Assuming a logging service for audit purposes
 
 /// Manages security aspects such as key generation, signing, and verification.
 /// Uses secure storage to store private keys.
@@ -11,6 +12,7 @@ class SecurityManager {
   late String privateKey;
   late String publicKey;
   final FlutterSecureStorage secureStorage;
+  final LoggingService loggingService = LoggingService(); // For logging events
 
   /// Creates a new instance of [SecurityManager] for the given [atSign].
   SecurityManager(this.atSign)
@@ -29,13 +31,14 @@ class SecurityManager {
       // Store private key securely
       await secureStorage.write(key: '${atSign}_privateKey', value: privateKey);
 
-      print('SecurityManager initialized for atSign: $atSign');
+      loggingService.log('SecurityManager initialized for atSign: $atSign');
     } catch (e) {
-      print('Error initializing SecurityManager: $e');
+      loggingService.error('Error initializing SecurityManager for $atSign: $e');
       rethrow;
     }
   }
 
+  /// Loads an existing key pair from secure storage or generates a new one.
   Future<SimpleKeyPair> _loadOrGenerateKeyPair() async {
     final algorithm = X25519();
 
@@ -44,39 +47,39 @@ class SecurityManager {
         await secureStorage.read(key: '${atSign}_privateKey');
 
     if (storedPrivateKey != null) {
-      print('Loading existing key pair from secure storage.');
+      loggingService.log('Loading existing key pair from secure storage.');
       final keyBytes = base64Decode(storedPrivateKey);
       return algorithm.newKeyPairFromSeed(keyBytes);
     }
 
     // Generate a new key pair if none exist
-    print('Generating new key pair for atSign: $atSign');
+    loggingService.log('Generating new key pair for atSign: $atSign');
     final newKeyPair = await algorithm.newKeyPair();
     final privateKeyBytes = await newKeyPair.extractPrivateKeyBytes();
 
     // Store the private key securely
     await secureStorage.write(
         key: '${atSign}_privateKey', value: base64Encode(privateKeyBytes));
-    print('Key pair generated and stored securely.');
+    loggingService.log('Key pair generated and stored securely.');
     return newKeyPair;
   }
 
-  /// Signs a message using the private key.
+  /// Signs a message using the private key and returns the signature as a base64 string.
   Future<String> signMessage(String message) async {
     try {
       final signatureAlgorithm = Ed25519();
       final messageBytes = utf8.encode(message);
       final signature =
           await signatureAlgorithm.sign(messageBytes, keyPair: keyPair);
-      print('Message signed successfully.');
+      loggingService.log('Message signed successfully for atSign: $atSign.');
       return base64Encode(signature.bytes);
     } catch (e) {
-      print('Error signing message: $e');
+      loggingService.error('Error signing message for $atSign: $e');
       return '';
     }
   }
 
-  /// Verifies a signature using the provided public key.
+  /// Verifies a signature using the provided public key and returns the result as a boolean.
   Future<bool> verifySignature(
       String message, String signature, String publicKey) async {
     try {
@@ -84,6 +87,7 @@ class SecurityManager {
       final messageBytes = utf8.encode(message);
       final signatureBytes = base64Decode(signature);
       final publicKeyBytes = base64Decode(publicKey);
+
       final publicKeyObj =
           SimplePublicKey(publicKeyBytes, type: KeyPairType.ed25519);
 
@@ -93,13 +97,13 @@ class SecurityManager {
       );
 
       if (isValid) {
-        print('Signature verification successful.');
+        loggingService.log('Signature verification successful for atSign: $atSign.');
       } else {
-        print('Signature verification failed.');
+        loggingService.warn('Signature verification failed for atSign: $atSign.');
       }
       return isValid;
     } catch (e) {
-      print('Error verifying signature: $e');
+      loggingService.error('Error verifying signature for $atSign: $e');
       return false;
     }
   }
@@ -108,9 +112,26 @@ class SecurityManager {
   Future<void> deleteKeys() async {
     try {
       await secureStorage.delete(key: '${atSign}_privateKey');
-      print('Private key deleted for atSign: $atSign');
+      loggingService.log('Private key deleted for atSign: $atSign');
     } catch (e) {
-      print('Error deleting private key: $e');
+      loggingService.error('Error deleting private key for $atSign: $e');
+    }
+  }
+
+  /// Retrieves the stored private key for internal usage or future development.
+  Future<String?> retrievePrivateKey() async {
+    try {
+      String? storedPrivateKey =
+          await secureStorage.read(key: '${atSign}_privateKey');
+      if (storedPrivateKey != null) {
+        loggingService.log('Private key retrieved for atSign: $atSign');
+      } else {
+        loggingService.warn('No private key found for atSign: $atSign');
+      }
+      return storedPrivateKey;
+    } catch (e) {
+      loggingService.error('Error retrieving private key for $atSign: $e');
+      return null;
     }
   }
 }

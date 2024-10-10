@@ -1,4 +1,4 @@
-module server
+//Nimbus/server/go.modmodule server
 
 go 1.18
 

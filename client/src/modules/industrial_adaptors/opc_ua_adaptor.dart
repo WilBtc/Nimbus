@@ -1,5 +1,5 @@
-// src/modules/industrial_adaptors/opc_ua_adaptor.dart
 import 'package:opcua/opcua.dart'; // Example OPC-UA client library, adjust based on actual library used.
+import 'logging_service.dart'; // Assuming a logging service for centralized log handling.
 
 class OPCUAAdaptor {
   final String serverUrl;
@@ -7,6 +7,9 @@ class OPCUAAdaptor {
   final String securityMode;
   final String username;
   final String password;
+
+  late OpcUaClient _client;
+  final LoggingService loggingService = LoggingService(); // Logging Service for centralized logging
 
   OPCUAAdaptor({
     required this.serverUrl,
@@ -16,9 +19,7 @@ class OPCUAAdaptor {
     this.password = '',
   });
 
-  late OpcUaClient _client;
-
-  // Initialize and connect the OPC-UA client with security settings
+  /// Initialize and connect the OPC-UA client with security settings.
   Future<void> initialize() async {
     try {
       _client = OpcUaClient(
@@ -27,41 +28,42 @@ class OPCUAAdaptor {
         securityMode: securityMode,
       );
 
-      // Configure user authentication if credentials are provided
+      // Configure user authentication if credentials are provided.
       if (username.isNotEmpty && password.isNotEmpty) {
         _client.setUserToken(username, password);
       }
 
       await _client.connect();
-      print('OPC-UA client connected to $serverUrl with security: $securityPolicy/$securityMode');
+      loggingService.log('OPC-UA client connected to $serverUrl with security: $securityPolicy/$securityMode');
     } catch (e) {
-      print('Error connecting OPC-UA client: $e');
+      loggingService.error('Error connecting OPC-UA client: $e');
+      rethrow;
     }
   }
 
-  // Read a specific node's value
+  /// Read a specific node's value.
   Future<dynamic> readNode(String nodeId) async {
     try {
       var result = await _client.readNode(nodeId);
-      print('Read OPC-UA node $nodeId: $result');
+      loggingService.log('Read OPC-UA node $nodeId: $result');
       return result;
     } catch (e) {
-      print('Error reading OPC-UA node $nodeId: $e');
+      loggingService.error('Error reading OPC-UA node $nodeId: $e');
       return null;
     }
   }
 
-  // Write a value to a specific node
+  /// Write a value to a specific node.
   Future<void> writeNode(String nodeId, dynamic value) async {
     try {
       await _client.writeNode(nodeId, value);
-      print('Wrote $value to OPC-UA node $nodeId');
+      loggingService.log('Wrote $value to OPC-UA node $nodeId');
     } catch (e) {
-      print('Error writing to OPC-UA node $nodeId: $e');
+      loggingService.error('Error writing to OPC-UA node $nodeId: $e');
     }
   }
 
-  // Read multiple nodes at once
+  /// Read multiple nodes at once.
   Future<Map<String, dynamic>> readMultipleNodes(List<String> nodeIds) async {
     Map<String, dynamic> results = {};
     try {
@@ -71,54 +73,59 @@ class OPCUAAdaptor {
           results[nodeId] = result;
         }
       }
-      print('Read multiple OPC-UA nodes: $results');
+      loggingService.log('Read multiple OPC-UA nodes: $results');
       return results;
     } catch (e) {
-      print('Error reading multiple OPC-UA nodes: $e');
+      loggingService.error('Error reading multiple OPC-UA nodes: $e');
       return {};
     }
   }
 
-  // Subscribe to changes in a specific node
+  /// Subscribe to changes in a specific node.
   Future<void> subscribeToNode(String nodeId, Function(dynamic) onDataChange) async {
     try {
       await _client.subscribeToNode(nodeId, (value) {
-        print('Data change detected on node $nodeId: $value');
+        loggingService.log('Data change detected on node $nodeId: $value');
         onDataChange(value);
       });
     } catch (e) {
-      print('Error subscribing to OPC-UA node $nodeId: $e');
+      loggingService.error('Error subscribing to OPC-UA node $nodeId: $e');
     }
   }
 
-  // Unsubscribe from a specific node
+  /// Unsubscribe from a specific node.
   Future<void> unsubscribeFromNode(String nodeId) async {
     try {
       await _client.unsubscribeFromNode(nodeId);
-      print('Unsubscribed from OPC-UA node $nodeId');
+      loggingService.log('Unsubscribed from OPC-UA node $nodeId');
     } catch (e) {
-      print('Error unsubscribing from OPC-UA node $nodeId: $e');
+      loggingService.error('Error unsubscribing from OPC-UA node $nodeId: $e');
     }
   }
 
-  // Disconnect the OPC-UA client safely
+  /// Disconnect the OPC-UA client safely.
   void disconnect() {
     try {
       if (_client.isConnected) {
         _client.disconnect();
-        print('OPC-UA client disconnected.');
+        loggingService.log('OPC-UA client disconnected.');
       } else {
-        print('OPC-UA client was already disconnected.');
+        loggingService.log('OPC-UA client was already disconnected.');
       }
     } catch (e) {
-      print('Error during OPC-UA client disconnection: $e');
+      loggingService.error('Error during OPC-UA client disconnection: $e');
     }
   }
 
-  // Check if the client is currently connected
+  /// Check if the client is currently connected.
   bool isConnected() {
-    bool connected = _client.isConnected;
-    print('OPC-UA client connection status: ${connected ? 'Connected' : 'Disconnected'}');
-    return connected;
+    try {
+      bool connected = _client.isConnected;
+      loggingService.log('OPC-UA client connection status: ${connected ? 'Connected' : 'Disconnected'}');
+      return connected;
+    } catch (e) {
+      loggingService.error('Error checking OPC-UA connection status: $e');
+      return false;
+    }
   }
 }

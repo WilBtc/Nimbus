@@ -1,5 +1,5 @@
-// src/modules/industrial_adaptors/modbus_adaptor.dart
 import 'package:modbus/modbus.dart'; // Example library for Modbus communication, adjust as needed.
+import 'logging_service.dart'; // Assuming a logging service for logging Modbus operations.
 
 class ModbusAdaptor {
   final String deviceIp;
@@ -9,81 +9,88 @@ class ModbusAdaptor {
   ModbusAdaptor({required this.deviceIp, this.port = 502, this.timeout = 5});
 
   late ModbusClient _client;
+  final LoggingService loggingService = LoggingService(); // Logging Service for centralized logging
 
-  // Initialize and connect the Modbus client
+  /// Initialize and connect the Modbus client.
   Future<void> initialize() async {
     try {
       _client = ModbusClient(deviceIp, port: port)
         ..timeout = Duration(seconds: timeout);
       await _client.connect();
-      print('Modbus client connected to $deviceIp:$port');
+      loggingService.log('Modbus client connected to $deviceIp:$port');
     } catch (e) {
-      print('Error connecting Modbus client: $e');
+      loggingService.error('Error connecting Modbus client: $e');
+      rethrow;
     }
   }
 
-  // Read a single register from the Modbus device
+  /// Read a single register from the Modbus device.
   Future<int?> readRegister(int registerAddress) async {
     try {
       var result = await _client.readHoldingRegisters(registerAddress, 1);
-      print('Read Modbus register $registerAddress: ${result[0]}');
+      loggingService.log('Read Modbus register $registerAddress: ${result[0]}');
       return result[0];
     } catch (e) {
-      print('Error reading Modbus register: $e');
+      loggingService.error('Error reading Modbus register $registerAddress: $e');
       return null;
     }
   }
 
-  // Write a single value to a specific register
+  /// Write a single value to a specific register.
   Future<void> writeRegister(int registerAddress, int value) async {
     try {
       await _client.writeSingleRegister(registerAddress, value);
-      print('Wrote $value to Modbus register $registerAddress');
+      loggingService.log('Wrote $value to Modbus register $registerAddress');
     } catch (e) {
-      print('Error writing to Modbus register: $e');
+      loggingService.error('Error writing to Modbus register $registerAddress: $e');
     }
   }
 
-  // Read multiple registers, useful for bulk data acquisition
+  /// Read multiple registers for bulk data acquisition.
   Future<List<int>?> readMultipleRegisters(int startAddress, int count) async {
     try {
       var result = await _client.readHoldingRegisters(startAddress, count);
-      print('Read Modbus registers from $startAddress to ${startAddress + count - 1}: $result');
+      loggingService.log('Read Modbus registers from $startAddress to ${startAddress + count - 1}: $result');
       return result;
     } catch (e) {
-      print('Error reading multiple Modbus registers: $e');
+      loggingService.error('Error reading multiple Modbus registers starting at $startAddress: $e');
       return null;
     }
   }
 
-  // Write multiple registers in a single operation
+  /// Write multiple registers in a single operation.
   Future<void> writeMultipleRegisters(int startAddress, List<int> values) async {
     try {
       await _client.writeMultipleRegisters(startAddress, values);
-      print('Wrote values $values to Modbus registers starting at $startAddress');
+      loggingService.log('Wrote values $values to Modbus registers starting at $startAddress');
     } catch (e) {
-      print('Error writing multiple Modbus registers: $e');
+      loggingService.error('Error writing multiple Modbus registers starting at $startAddress: $e');
     }
   }
 
-  // Check the connection status of the Modbus client
+  /// Check the connection status of the Modbus client.
   bool isConnected() {
-    bool connected = _client.isConnected;
-    print('Modbus client connection status: ${connected ? 'Connected' : 'Disconnected'}');
-    return connected;
+    try {
+      bool connected = _client.isConnected;
+      loggingService.log('Modbus client connection status: ${connected ? 'Connected' : 'Disconnected'}');
+      return connected;
+    } catch (e) {
+      loggingService.error('Error checking Modbus connection status: $e');
+      return false;
+    }
   }
 
-  // Disconnect the Modbus client safely
+  /// Disconnect the Modbus client safely.
   void disconnect() {
     try {
       if (_client.isConnected) {
         _client.disconnect();
-        print('Modbus client disconnected.');
+        loggingService.log('Modbus client disconnected.');
       } else {
-        print('Modbus client was already disconnected.');
+        loggingService.log('Modbus client was already disconnected.');
       }
     } catch (e) {
-      print('Error during Modbus client disconnection: $e');
+      loggingService.error('Error during Modbus client disconnection: $e');
     }
   }
 }

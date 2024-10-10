@@ -1,3 +1,5 @@
+#client/ pubspec.yaml
+
 name: nimbus_client
 description: Nimbus Client - Secure communication and industrial protocol integration using atProtocol.
 version: 0.1.1

@@ -1,5 +1,4 @@
 // server/src/modules/access_control.go
-
 package modules
 
 import (
@@ -23,11 +22,11 @@ const (
 
 // AccessControl manages permissions, roles, and secure access to the server.
 type AccessControl struct {
-	permissions    sync.Map             // Stores access permissions for devices with associated roles
-	logger         *log.Logger          // Logger for recording access control activities
-	auditLog       []AccessEvent        // Stores audit logs for access events
-	auditMutex     sync.Mutex           // Mutex for concurrent access to audit logs
-	dessServer     *server.AtServer     // Reference to the DESS server for authentication and access control
+	permissions    sync.Map         // Stores access permissions for devices with associated roles
+	logger         *log.Logger      // Logger for recording access control activities
+	auditLog       []AccessEvent    // Stores audit logs for access events
+	auditMutex     sync.Mutex       // Mutex for concurrent access to audit logs
+	dessServer     *server.AtServer // Reference to the DESS server for authentication and access control
 }
 
 // AccessEvent represents an access attempt or change
@@ -38,29 +37,30 @@ type AccessEvent struct {
 	Role      Role
 }
 
+// NewAccessControl initializes a new AccessControl instance with logging and DESS server integration
 func NewAccessControl(logger *log.Logger, dessServer *server.AtServer) *AccessControl {
 	return &AccessControl{
-		logger:      logger,
-		auditLog:    make([]AccessEvent, 0),
-		dessServer:  dessServer, // Integrate DESS server instance
+		logger:     logger,
+		auditLog:   make([]AccessEvent, 0),
+		dessServer: dessServer,
 	}
 }
 
-// GrantAccess grants access to a specific device ID with a specified role.
+// GrantAccess grants access to a specific device ID with a specified role
 func (ac *AccessControl) GrantAccess(deviceID string, role Role) {
 	ac.permissions.Store(deviceID, role)
 	ac.logger.Printf("Access granted to device %s with role %s\n", deviceID, role)
 	ac.logAccessEvent(deviceID, "granted access", role)
 }
 
-// RevokeAccess revokes access for a specific device ID.
+// RevokeAccess revokes access for a specific device ID
 func (ac *AccessControl) RevokeAccess(deviceID string) {
 	ac.permissions.Delete(deviceID)
 	ac.logger.Printf("Access revoked for device %s\n", deviceID)
 	ac.logAccessEvent(deviceID, "revoked access", NoAccess)
 }
 
-// CheckAccess checks if a device has permission to access the server based on role.
+// CheckAccess checks if a device has permission to access the server based on the required role
 func (ac *AccessControl) CheckAccess(deviceID string, requiredRole Role) bool {
 	// Check if the device is authenticated with the DESS server
 	if !ac.dessServer.IsAuthenticated(deviceID) {
@@ -97,22 +97,23 @@ func (ac *AccessControl) roleSufficient(currentRole, requiredRole Role) bool {
 		UserRole:  2,
 		AdminRole: 3,
 	}
-
 	return roles[currentRole] >= roles[requiredRole]
 }
 
-// logAccessEvent logs the access event to the audit log
+// logAccessEvent records access events to the audit log
 func (ac *AccessControl) logAccessEvent(deviceID, action string, role Role) {
 	ac.auditMutex.Lock()
 	defer ac.auditMutex.Unlock()
+
 	event := AccessEvent{
 		DeviceID:  deviceID,
 		Timestamp: time.Now(),
 		Action:    action,
 		Role:      role,
 	}
+
 	ac.auditLog = append(ac.auditLog, event)
-	ac.logger.Printf("Audit log: %v", event)
+	ac.logger.Printf("Audit log recorded: %v", event)
 }
 
 // GetAuditLog returns a copy of the audit log for review

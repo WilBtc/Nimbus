@@ -1,35 +1,37 @@
 version: "3.7"
 
 services:
+  # DESS Secondary Server
   secondary:
     image: atsigncompany/secondary:dess
     command: "-a ${ATSIGN} -p ${PORT} -s ${SECRET}"
     ports:
-      - target: ${PORT}
-        published: ${PORT}
+      - target: ${PORT}    # Expose the port for DESS
+        published: ${PORT}  # Publish the port on the host machine
     volumes:
-      - ~/atsign/etc/live/${DOMAIN}:/atsign/certs
-      - ~/atsign/etc/archive/${DOMAIN}:/archive/${DOMAIN}
-      - ~/atsign/${ATSIGN}/storage:/atsign/storage
+      - ~/atsign/etc/live/${DOMAIN}:/atsign/certs      # SSL certificates path
+      - ~/atsign/etc/archive/${DOMAIN}:/archive/${DOMAIN}  # Archive for older certificates
+      - ~/atsign/${ATSIGN}/storage:/atsign/storage     # Persistent storage for DESS
     networks:
-      second: {}
+      second: {}  # Connect to the external "secondaries" network
 
+  # Shepherd for Automatic Service Management
   shepherd:
     image: mazzolino/shepherd:latest
     environment:
-      TZ: 'US/PST'
-      SLEEP_TIME: '30m'
-      VERBOSE: 'true'
-      FILTER_SERVICES: 'label=com.docker.stack.image=atsigncompany/secondary:dess'
-      IMAGE_AUTOCLEAN_LIMIT: 5
+      TZ: 'US/PST'                                # Set the time zone
+      SLEEP_TIME: '30m'                           # Interval for cleaning checks
+      VERBOSE: 'true'                             # Enable verbose logging
+      FILTER_SERVICES: 'label=com.docker.stack.image=atsigncompany/secondary:dess'  # Filter for DESS services
+      IMAGE_AUTOCLEAN_LIMIT: 5                    # Keep only the latest 5 images for autocleaning
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for service management
     deploy:
       placement:
         constraints:
-          - node.role == manager
+          - node.role == manager  # Ensure shepherd runs on manager nodes
 
 networks:
   second:
-    external: true
-    name: secondaries
+    external: true                # Use an external network for communication between services
+    name: secondaries             # Name of the external network

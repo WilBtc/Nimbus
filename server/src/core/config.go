@@ -28,12 +28,13 @@ type Config struct {
 	EncryptionConfig string // Placeholder for specific encryption settings, adjust based on DESS requirements
 	SecurityLevel    int
 	EdgeAnalytics    bool
-	Secret           string // Secret used for cram authentication to the secondary
+	Secret           string // Secret used for cram authentication to the secondary server
 	Email            string // Email address for SSL certificate management
 	SSLCertPath      string // Path to SSL certificate
 	SSLKeyPath       string // Path to SSL key
 }
 
+// LoadConfig loads configuration from environment variables and validates them
 func LoadConfig() (*Config, error) {
 	config := &Config{
 		AtSign:           getEnv("ATSIGN", ""),
@@ -57,7 +58,7 @@ func LoadConfig() (*Config, error) {
 		SSLKeyPath:       getEnv("SSL_KEY_PATH", ""), // Path to SSL key
 	}
 
-	// Perform validation on loaded configuration
+	// Validate the loaded configuration
 	if err := validateConfig(config); err != nil {
 		return nil, err
 	}
@@ -65,8 +66,9 @@ func LoadConfig() (*Config, error) {
 	return config, nil
 }
 
+// validateConfig ensures the configuration has all required fields and valid values
 func validateConfig(config *Config) error {
-	// Ensure all required configurations are set
+	// Check required fields
 	if config.AtSign == "" {
 		return errors.New("ATSIGN is required but not set in the environment variables")
 	}
@@ -85,11 +87,10 @@ func validateConfig(config *Config) error {
 		return fmt.Errorf("invalid email format: %s", config.Email)
 	}
 
-	// Check if essential paths exist or are writable
+	// Check if essential paths exist and are writable
 	if err := ensurePathExists(config.StoragePath); err != nil {
 		return fmt.Errorf("storage path error: %w", err)
 	}
-
 	if err := ensurePathExists(config.CommitLogPath); err != nil {
 		return fmt.Errorf("commit log path error: %w", err)
 	}
@@ -102,6 +103,7 @@ func validateConfig(config *Config) error {
 	return nil
 }
 
+// ensurePathExists checks if a path exists, and creates it if it does not
 func ensurePathExists(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if err := os.MkdirAll(path, 0750); err != nil {
@@ -111,6 +113,7 @@ func ensurePathExists(path string) error {
 	return nil
 }
 
+// getEnv fetches an environment variable value or returns a default value if not set
 func getEnv(key, defaultValue string) string {
 	if value, exists := os.LookupEnv(key); exists {
 		return value
@@ -118,6 +121,7 @@ func getEnv(key, defaultValue string) string {
 	return defaultValue
 }
 
+// getEnvSecure fetches a secure environment variable and logs a warning if empty
 func getEnvSecure(key, defaultValue string) string {
 	value := getEnv(key, defaultValue)
 	if value == "" && defaultValue == "" {
@@ -126,6 +130,7 @@ func getEnvSecure(key, defaultValue string) string {
 	return value
 }
 
+// getEnvAsInt fetches an environment variable and converts it to an integer, or returns a default value
 func getEnvAsInt(name string, defaultVal int) int {
 	valueStr := getEnv(name, "")
 	if value, err := strconv.Atoi(valueStr); err == nil {
@@ -134,6 +139,7 @@ func getEnvAsInt(name string, defaultVal int) int {
 	return defaultVal
 }
 
+// getEnvAsBool fetches an environment variable and converts it to a boolean, or returns a default value
 func getEnvAsBool(name string, defaultVal bool) bool {
 	valStr := getEnv(name, "")
 	if val, err := strconv.ParseBool(valStr); err == nil {
@@ -142,6 +148,7 @@ func getEnvAsBool(name string, defaultVal bool) bool {
 	return defaultVal
 }
 
+// isValidEmail checks if an email address has a valid format
 func isValidEmail(email string) bool {
 	// Basic email validation regex pattern
 	re := regexp.MustCompile(`^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`)

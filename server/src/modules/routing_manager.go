@@ -32,7 +32,7 @@ func NewRoutingManager(logger *log.Logger, dessServer *server.AtServer) *Routing
 	}
 }
 
-// AddRoute adds a new route to the routing manager with a specified priority.
+// AddRoute adds a new route to the routing manager with a specified priority, after verifying the device's authentication with DESS.
 func (rm *RoutingManager) AddRoute(deviceID string, conn net.Conn, priority int) {
 	rm.routeMutex.Lock()
 	defer rm.routeMutex.Unlock()

@@ -1,4 +1,3 @@
-// test/data_processor_test.dart
 import 'package:test/test.dart';
 import 'package:nimbus_client/modules/data_processor.dart';
 
@@ -12,16 +11,34 @@ void main() {
       expect(result, [0.06, 0.1]);
     });
 
+    test('filterNoise handles empty list', () {
+      final data = [];
+      final result = dataProcessor.filterNoise(data);
+      expect(result, []);
+    });
+
     test('aggregateData sums values correctly', () {
       final data = [1.0, 2.0, 3.0];
       final result = dataProcessor.aggregateData(data);
       expect(result, 6.0);
     });
 
+    test('aggregateData handles empty list', () {
+      final data = [];
+      final result = dataProcessor.aggregateData(data);
+      expect(result, 0.0);
+    });
+
     test('averageData calculates mean correctly', () {
       final data = [2.0, 4.0, 6.0];
       final result = dataProcessor.averageData(data);
       expect(result, 4.0);
+    });
+
+    test('averageData handles single value', () {
+      final data = [5.0];
+      final result = dataProcessor.averageData(data);
+      expect(result, 5.0);
     });
 
     test('medianData calculates median correctly for odd length', () {
@@ -52,6 +69,12 @@ void main() {
       final data = [5.0, 5.0, 5.0];
       final result = dataProcessor.normalizeData(data);
       expect(result, [5.0, 5.0, 5.0]);
+    });
+
+    test('normalizeData handles single value', () {
+      final data = [7.0];
+      final result = dataProcessor.normalizeData(data);
+      expect(result, [7.0]);
     });
   });
 }

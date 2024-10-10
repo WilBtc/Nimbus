@@ -1,0 +1,223 @@
+{
+  "project_guidelines": {
+    "project_name": "Nimbus Industrial IoT Client",
+    "description": "Nimbus Client is a secure communication and industrial protocol integration software built on the atProtocol for Industrial IoT environments.",
+    "standards": [
+      {
+        "name": "IEC 62443",
+        "description": "Cybersecurity standards for industrial automation and control systems.",
+        "requirements": {
+          "security_level": 2,
+          "encryption_required": true,
+          "authentication_required": true,
+          "audit_logs": {
+            "required": true,
+            "tamper_proof": true,
+            "log_event_types": ["access_attempt", "data_read", "data_write", "security_breach"]
+          }
+        }
+      },
+      {
+        "name": "ISO/IEC 27001",
+        "description": "Information security management standards.",
+        "requirements": {
+          "risk_management": {
+            "risk_assessment": true,
+            "risk_treatment_plan": true
+          },
+          "data_security": {
+            "encryption_at_rest": true,
+            "encryption_in_transit": true,
+            "secure_key_management": true,
+            "secure_authentication": true
+          },
+          "access_control": {
+            "role_based_access_control": true,
+            "least_privilege_principle": true,
+            "multi_factor_authentication": true
+          },
+          "incident_response": {
+            "incident_logging": true,
+            "alert_notifications": true,
+            "backup_and_recovery": true
+          }
+        }
+      },
+      {
+        "name": "GDPR",
+        "description": "General Data Protection Regulation for handling personal data.",
+        "requirements": {
+          "data_protection": {
+            "data_minimization": true,
+            "pseudonymization": true,
+            "user_consent_required": true,
+            "data_erasure": true
+          },
+          "privacy_by_design": {
+            "required": true
+          },
+          "user_rights": {
+            "data_access_request": true,
+            "data_correction_request": true,
+            "data_deletion_request": true
+          }
+        }
+      }
+    ],
+    "development_guidelines": {
+      "modularity": "The app should follow a modular structure where different services, such as device management, encryption, logging, and communication, are separated into individual modules.",
+      "error_handling": {
+        "best_practices": {
+          "log_errors": true,
+          "send_alerts_on_critical_failure": true,
+          "ensure_no_sensitive_data in logs": true
+        }
+      },
+      "logging": {
+        "log_level": "INFO",
+        "rotate_logs": true,
+        "log_rotation_interval": "24h",
+        "logs_encrypted": true,
+        "logs_must_include": ["access_control", "device_status", "file_operations", "collaborative_updates"]
+      },
+      "documentation": {
+        "code_comments": "All code must have clear comments explaining the logic, inputs, outputs, and security concerns.",
+        "readme": "Each module must have a README explaining its purpose, how to configure it, and security notes."
+      },
+      "code_quality": {
+        "linter_required": true,
+        "formatter_required": true,
+        "coding_standards": "Follow industry standards for readability, efficiency, and security.",
+        "test_coverage_required": 90
+      }
+    }
+  },
+  "modules": [
+    {
+      "name": "Hyperswarm",
+      "description": "Module for peer discovery and connections.",
+      "guidelines": {
+        "peer_discovery": "Peers must be authenticated before establishing any data exchange.",
+        "security": {
+          "encryption_required": true,
+          "auth_required": true,
+          "log_peer_connections": true
+        },
+        "performance": {
+          "latency_threshold": 100,
+          "retry_attempts": 3
+        }
+      }
+    },
+    {
+      "name": "Hypercore",
+      "description": "Module for data chunking, verification, and distribution.",
+      "guidelines": {
+        "file_chunking": {
+          "chunk_size": "4MB",
+          "hash_verification_required": true
+        },
+        "data_verification": "All distributed data must be verified via SHA-256.",
+        "logging": {
+          "log_chunk_upload": true,
+          "log_chunk_download": true,
+          "log_verification_status": true
+        }
+      }
+    },
+    {
+      "name": "Autobase",
+      "description": "Multi-writer database setup for collaborative file sharing.",
+      "guidelines": {
+        "collaboration": {
+          "conflict_resolution": "Use CRDTs (Conflict-free Replicated Data Types) to handle multi-writer conflicts.",
+          "file_integrity_checks": true
+        },
+        "security": {
+          "access_control": {
+            "rbac": true,
+            "roles": {
+              "admin": {
+                "permissions": ["read", "write", "delete", "manage"]
+              },
+              "user": {
+                "permissions": ["read", "write"]
+              },
+              "guest": {
+                "permissions": ["read"]
+              }
+            }
+          }
+        },
+        "compliance": {
+          "gdpr_compliant": true,
+          "data_minimization": true
+        }
+      }
+    },
+    {
+      "name": "AtsignAuth",
+      "description": "Atsign authentication and encryption logic.",
+      "guidelines": {
+        "authentication": {
+          "mfa_required": true,
+          "token_expiry": 3600,
+          "secure_storage_for_keys": true
+        },
+        "encryption": {
+          "type": "AES-256",
+          "in_transit": "TLS 1.3",
+          "at_rest": "AES-256",
+          "key_rotation": "every 90 days"
+        },
+        "logging": {
+          "auth_attempts": true,
+          "failed_attempts_alert": true
+        }
+      }
+    },
+    {
+      "name": "NoPorts",
+      "description": "NoPorts tunnel setup and management.",
+      "guidelines": {
+        "security": {
+          "no_open_ports": true,
+          "tunnel_encryption": "TLS 1.3",
+          "session_management": {
+            "session_timeout": 300,
+            "reconnect_attempts": 3
+          },
+          "monitoring": {
+            "monitor_for_intrusion": true,
+            "send_alerts_on_breach": true
+          }
+        }
+      }
+    }
+  ],
+  "testing": {
+    "unit_tests": {
+      "description": "Ensure all core functionalities are unit tested.",
+      "guidelines": {
+        "minimum_coverage": 90,
+        "test_critical_paths": true
+      }
+    },
+    "integration_tests": {
+      "description": "Test the interaction between components such as Hyperswarm, Hypercore, and Autobase.",
+      "guidelines": {
+        "simulate_real_conditions": true,
+        "test_performance_under_load": true
+      }
+    },
+    "security_tests": {
+      "description": "Test security features to ensure compliance with IEC, ISO, and GDPR.",
+      "guidelines": {
+        "vulnerability_scan": true,
+        "penetration_testing": true,
+        "data_leakage_prevention": true
+      }
+    }
+  }
+}
+

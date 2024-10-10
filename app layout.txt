@@ -1,0 +1,97 @@
+# Nimbus Project Blueprint
+
+## Configuration
+```
+/config                        # Configuration directory (secure storage for sensitive data)
+├── keys.env                   # Environment variables for API keys (should be .gitignored)
+└── config.yaml                # Secure configuration settings (use encryption if needed)
+``` 
+
+## Client
+```
+/client                       # Device-side (Nimbus) implementation
+├── /src
+│   ├── main.dart                 # Entry point for Nimbus device-side application
+│   ├── /core                     # Core functionalities and base setup
+│   │   ├── at_protocol.dart      # Direct integration with at_client_mobile from at_server repo
+│   │   ├── security_manager.dart # Handles additional security features on top of atProtocol
+│   │   └── config.dart           # Configuration settings (e.g., atSign setup)
+│   ├── /modules                  # Nimbus-specific extensions
+│   │   ├── industrial_adaptors   # Protocol adaptors for industrial protocols (Modbus, OPC-UA, MQTT)
+│   │   ├── data_processor.dart   # Handles data filtering and pre-processing
+│   │   └── decision_engine.dart  # Logic for local decision-making at the device level
+│   ├── pubspec.yaml              # Dart package manager configuration using at_client_mobile
+└── README.md                     # Documentation for setup and use of Nimbus client
+```
+
+## Server
+```
+/server                       # NimBus Edge Server implementation using DESS
+├── /src
+│   ├── main.go                   # Entry point for NimBus edge server application
+│   ├── /core                     # Core functionalities extended from DESS
+│   │   ├── dess_server.go        # New component using DESS as the secondary server
+│   │   ├── config.go             # Extended configuration file for industrial settings
+│   │   └── security_gateway.go   # Additional security layer inspecting traffic
+│   ├── /modules                  # Nimbus-specific edge computing extensions
+│   │   ├── analytics_engine.go   # Module for real-time analytics at the edge
+│   │   ├── routing_manager.go    # Extended routing manager with industrial logic
+│   │   └── access_control.go     # Handles advanced permissions and secure access
+│   ├── /utils                    # Utilities reused and extended from DESS
+│   │   ├── encryption_utils.go   # Using DESS encryption utilities with minor extensions
+│   │   └── logger.go             # Server logging utility extended for industrial diagnostics
+│   ├── /api                      # API implementations
+│   │   ├── hyperswarm.js         # Hyperswarm setup for peer discovery and connections
+│   │   ├── hypercore.js          # File chunking, verification, and distribution via Hypercore
+│   │   ├── autobase.js           # Multi-writer database setup for collaborative data sharing
+│   │   ├── atsignAuth.js         # Atsign authentication and encryption logic
+│   │   └── noPorts.js            # NoPorts tunnel initialization and management
+│   ├── /services                 # Service implementations for various functionalities
+│   │   ├── deviceManager.js      # Service for managing device connections and interactions
+│   │   ├── fileManager.js        # Service for managing file uploads, downloads, and data sharing
+│   │   ├── encryptionService.js  # Encryption/decryption using Atsign DESS
+│   │   ├── dataLogger.js         # Log real-time interactions and track updates
+│   │   └── dataCollab.js         # Manage collaborative file access and updates
+│   ├── /routes                   # REST API routes
+│   │   ├── deviceRoutes.js       # REST routes for device connection and management
+│   │   └── fileRoutes.js         # API routes for file sharing and download requests
+│   ├── /ui                       # User interface components
+│   │   ├── /dashboard
+│   │   │   ├── index.html        # Web-based dashboard for device and network status
+│   │   │   ├── styles.css        # Styling for the dashboard UI
+│   │   │   └── dashboard.js      # Dashboard logic (real-time data fetching, user interactions)
+│   │   ├── /fileManagement
+│   │   │   ├── fileManager.html  # UI for file uploads, downloads, and sharing
+│   │   │   └── fileManager.js    # File management logic (display files, file permissions, actions)
+│   │   ├── /logs
+│   │   │   ├── logViewer.html    # UI for viewing data logs and audit trails
+│   │   │   └── logViewer.js      # Logic for displaying and filtering logs
+│   │   └── /collaboration
+│   │       ├── collaboration.html# Collaborative file-sharing interface for Autobase
+│   │       └── collaboration.js  # Logic for managing collaborative file writing and updates
+│   ├── /public                   # Publicly accessible assets
+│   │   ├── index.html            # Main landing page for the web-based interface
+│   │   ├── styles.css            # Common styles for all UI pages
+│   │   └── logo.png              # Branding and assets
+│   ├── /test                     # Test cases for server functionalities
+│   │   ├── testHyperswarm.js     # Test cases for Hyperswarm peer discovery and connections
+│   │   ├── testAtsign.js         # Test cases for Atsign authentication and encryption
+│   │   ├── testNoPorts.js        # Test cases for NoPorts tunnel
+│   │   ├── testHypercore.js      # Test cases for data storage and immutability with Hypercore
+│   │   └── testAutobase.js       # Test cases for collaborative data sharing with Autobase
+├── app.js                        # Main entry point for the application
+└── README.md                     # Documentation for setup and use of NimBus server
+```
+
+## Documentation
+```
+/docs                 # Documentation for the entire Nimbus project
+├── architecture.md               # Detailed architecture documentation highlighting DESS integration
+├── setup_guide.md                # Step-by-step guide with notes on DESS components
+├── security_considerations.md    # Security overview, leveraging DESS’s Zero Trust model
+└── contributing.md               # Guidelines for contributing, with links to DESS collaboration
+```
+
+## License
+```
+LICENSE               # Open-source license compatible with DESS

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Manager</title>
+  <link rel="stylesheet" href="../dashboard/styles.css"> <!-- Reuse existing CSS styles from the dashboard -->
+</head>
+<body>
+  <header>
+    <h1>Nimbus File Management</h1>
+  </header>
+
+  <main>
+    <section id="file-upload">
+      <h2>Upload File</h2>
+      <form id="upload-form">
+        <label for="fileInput">Select File:</label>
+        <input type="file" id="fileInput" name="fileInput" required>
+        <label for="fileAuthor">Your Name:</label>
+        <input type="text" id="fileAuthor" name="fileAuthor" required>
+        <button type="submit">Upload File</button>
+      </form>
+    </section>
+
+    <section id="file-list-section">
+      <h2>Available Files</h2>
+      <div id="file-list">
+        <!-- Files will be dynamically inserted here -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Nimbus</p>
+  </footer>
+
+  <script src="fileManager.js"></script>
+</body>
+</html>

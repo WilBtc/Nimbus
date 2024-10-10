@@ -1,23 +1,25 @@
-Here's a detailed `setup_guide.md` document to guide Insa Automations engineers through the setup process of the Nimbus Edge Server, including the integration of DESS components. This guide will cover the prerequisites, installation, configuration, and verification steps necessary to get the system running smoothly.
+**Nimbus Edge Server Setup Guide**, including DESS integration for engineers to follow during the installation and configuration process:
+
+---
 
 ### **`setup_guide.md` - Nimbus Edge Server Setup Guide**
 
-# Nimbus Edge Server Setup Guide
+# **Nimbus Edge Server Setup Guide**
 
-This guide provides step-by-step instructions to set up the Nimbus Edge Server using the DESS (Decentralized Edge Secondary Server) components. Follow the steps carefully to ensure a successful installation and configuration.
+This guide provides detailed instructions to set up the Nimbus Edge Server, incorporating **DESS (Decentralized Edge Secondary Server)** components. Follow these steps to ensure a successful installation and configuration of the system.
 
-## Prerequisites
+## **Prerequisites**
 
-Before you begin, ensure that the following prerequisites are met:
+Before starting the setup process, ensure you have the following:
 
-1. **Operating System**: A Linux-based server (Ubuntu, Debian, CentOS, or similar) with root access.
+1. **Operating System**: A Linux-based server (e.g., Ubuntu, Debian, CentOS) with root access.
 2. **Go**: Version 1.18 or higher. Install Go from [golang.org](https://golang.org/dl/).
-3. **Docker**: Docker and Docker Compose must be installed to run DESS components. Install Docker from [docker.com](https://docs.docker.com/get-docker/).
+3. **Docker**: Docker and Docker Compose must be installed to run DESS. Install Docker from [docker.com](https://docs.docker.com/get-docker/).
 4. **Git**: Git for cloning repositories. Install from [git-scm.com](https://git-scm.com/downloads).
-5. **atSign**: A registered atSign for the server setup. Obtain an atSign from [atsign.com](https://atsign.com/).
-6. **Environment Variables**: Securely store sensitive information such as API keys and secrets in environment variables or configuration files as instructed.
+5. **atSign**: A registered atSign for the server setup. Obtain one from [atsign.com](https://atsign.com/).
+6. **Environment Variables**: Store sensitive information like API keys and secrets securely in environment variables or configuration files.
 
-## Step 1: Clone the Nimbus Project Repository
+## **Step 1: Clone the Nimbus Project Repository**
 
 Start by cloning the Nimbus project repository from GitHub:
 
@@ -26,20 +28,20 @@ git clone https://github.com/yourusername/nimbus_server.git
 cd nimbus_server/server
 ```
 
-## Step 2: Install Dependencies
+## **Step 2: Install Dependencies**
 
-Install the required Go dependencies using the Go module system:
+Use the Go module system to install the required dependencies:
 
 ```bash
 # Ensure you are inside the /server directory
 go mod tidy
 ```
 
-This command will download and install all necessary dependencies specified in the `go.mod` file, including DESS components.
+This will download and install all necessary dependencies as specified in the `go.mod` file, including DESS components.
 
-## Step 3: Configure the Environment Variables
+## **Step 3: Configure the Environment Variables**
 
-Set up the environment variables needed for the Nimbus server. You can use a `.env` file in the `/config` directory or directly export the variables in your terminal session.
+Set up the environment variables for the Nimbus server. You can either export them directly in your terminal or create a `.env` file.
 
 Create a `.env` file inside the `/config` directory:
 
@@ -48,7 +50,7 @@ Create a `.env` file inside the `/config` directory:
 touch config/keys.env
 ```
 
-Edit the `keys.env` file and add the necessary environment variables:
+Edit the `keys.env` file to add the required environment variables:
 
 ```plaintext
 ATSIGN="@nimbus1_01"
@@ -60,13 +62,13 @@ ATSIGN_API_KEY="dc34ac3e-00e6-4d49-a557-0e3945372ed9"
 EMAIL="admin@nimbus.example.com"
 ```
 
-> **Note**: Ensure that the `.env` file is included in `.gitignore` to prevent it from being committed to version control.
+> **Note**: Make sure `.env` is listed in `.gitignore` to prevent sensitive data from being committed to version control.
 
-## Step 4: Set Up DESS Components
+## **Step 4: Set Up DESS Components**
 
-### 4.1 Install DESS (Decentralized Edge Secondary Server)
+### **4.1 Install DESS**
 
-Follow the instructions to install DESS on your server:
+To install DESS, follow the steps below:
 
 1. **Download and Install DESS**:
    ```bash
@@ -78,25 +80,25 @@ Follow the instructions to install DESS on your server:
    sudo dess-create
    ```
 
-   During this process, you will be prompted to provide the atSign, domain, port, and CRAM key.
+   During the setup, provide the atSign, root domain, port, and CRAM key as prompted.
 
-### 4.2 Configure DESS for Nimbus
+### **4.2 Configure DESS for Nimbus**
 
-Modify the DESS configuration file to match your Nimbus setup requirements. Typical configurations are found in the `/etc/dess` directory. Ensure the correct paths are set for SSL certificates and storage locations.
+After installing DESS, modify its configuration file (typically located in `/etc/dess`) to match the Nimbus server’s setup. Ensure the correct paths for SSL certificates, storage, and logs are specified.
 
-### 4.3 Verify DESS Installation
+### **4.3 Verify DESS Installation**
 
-Check that DESS is running correctly by listing the Docker services:
+To verify that DESS is running correctly, list the Docker services:
 
 ```bash
 sudo docker ps
 ```
 
-You should see the DESS service listed and running without errors.
+You should see the DESS service listed and running without any errors.
 
-## Step 5: Configure Nimbus Server
+## **Step 5: Configure the Nimbus Server**
 
-Edit the `config.yaml` file in the `/config` directory to match your server's configuration. This file will include paths, security settings, logging configurations, and other essential parameters.
+Edit the `config.yaml` file located in the `/config` directory to customize the server’s paths, security, and logging settings.
 
 ### Sample `config.yaml`
 
@@ -125,7 +127,7 @@ logging:
   rotation_interval: "24h"
 ```
 
-## Step 6: Start the Nimbus Edge Server
+## **Step 6: Start the Nimbus Edge Server**
 
 Start the Nimbus server using the following command:
 
@@ -133,35 +135,35 @@ Start the Nimbus server using the following command:
 go run src/main.go
 ```
 
-Check the server logs for any startup errors. Ensure that all configurations are correctly applied and that the server is listening on the specified port.
+Check the logs for any startup errors, and confirm that the server is listening on the specified port.
 
-## Step 7: Verify Server Functionality
+## **Step 7: Verify Server Functionality**
 
-1. **Health Check**: Verify that the server is healthy by checking the logs or using health endpoints if configured.
-2. **Security Checks**: Ensure that the server’s security settings, such as authentication and encryption, are functioning correctly.
+1. **Health Check**: Use server logs or configured health endpoints to ensure the server is running properly.
+2. **Security Checks**: Confirm that all security measures, such as authentication and encryption, are active.
 
-## Step 8: Enable Monitoring and Alerts
+## **Step 8: Enable Monitoring and Alerts**
 
-Configure monitoring and alerting settings in the `config.yaml` and ensure that email notifications are set up correctly for critical alerts.
+To ensure proper monitoring and alerting, configure the relevant parameters in `config.yaml`. Email notifications should be set up to send alerts for critical events such as anomalies or security incidents.
 
-## Troubleshooting
+## **Troubleshooting**
 
-- **Common Errors**: Check logs in `/logs/nimbus.log` for any common startup or runtime errors.
-- **Permissions**: Ensure that all file paths have the correct permissions and are accessible by the server process.
-- **Network Issues**: Verify that the specified port is open and accessible through your firewall settings.
+- **Common Errors**: Check the `/logs/nimbus.log` file for detailed error messages during startup or operation.
+- **Permissions**: Verify that all necessary file paths (storage, logs, etc.) have the correct permissions and are accessible.
+- **Network Issues**: Ensure the specified port is open and available through your server's firewall settings.
 
-## Conclusion
+## **Conclusion**
 
-The Nimbus Edge Server is now set up and running with integrated DESS components for secure, real-time, and industrial-specific operations. For further assistance or to contribute to the project, refer to the `contributing.md` in the `/docs` directory.
+Your Nimbus Edge Server is now successfully set up and integrated with DESS components. This setup provides a secure, real-time environment for Industrial IoT operations. For further assistance, refer to the `contributing.md` file or reach out to the project maintainers.
 
-If you encounter issues during setup, consult the `security_considerations.md` for additional security tips and best practices.
-
----
-
-For questions or further help, please contact the Insa Automations engineering support team or visit our internal wiki for more resources.
+If you experience issues during the setup process, consult the `security_considerations.md` document for additional best practices and security configurations.
 
 ---
 
 **End of Setup Guide**
 
-If you need further details or additional guidance on specific steps, feel free to reach out!
+For any additional details or clarification on specific steps, feel free to reach out to the engineering support team or visit the internal project wiki.
+
+---
+
+Let me know if you need more details or further assistance!

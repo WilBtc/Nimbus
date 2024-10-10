@@ -1,5 +1,4 @@
-// server/src/core/at_secondary_server.go
-
+//Nimbus/server/src/core/at_secondary_server.go
 package core
 
 import (
@@ -12,7 +11,7 @@ import (
 	"server/utils"
 )
 
-// AtSecondaryServer struct manages the DESS server instance
+// AtSecondaryServer manages the DESS server instance and its lifecycle
 type AtSecondaryServer struct {
 	config          *Config
 	logger          *utils.Logger
@@ -23,6 +22,7 @@ type AtSecondaryServer struct {
 	securityGateway *SecurityGateway
 }
 
+// NewAtSecondaryServer initializes a new instance of AtSecondaryServer with provided configuration and security gateway
 func NewAtSecondaryServer(config *Config, securityGateway *SecurityGateway) *AtSecondaryServer {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &AtSecondaryServer{
@@ -34,6 +34,7 @@ func NewAtSecondaryServer(config *Config, securityGateway *SecurityGateway) *AtS
 	}
 }
 
+// Start initializes and runs the DESS atProtocol secondary server
 func (s *AtSecondaryServer) Start() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -46,7 +47,7 @@ func (s *AtSecondaryServer) Start() error {
 		return err
 	}
 
-	// Create a new DESS server with the provided configuration
+	// Create a new DESS server instance with provided configuration
 	s.server = server.NewAtServer(&server.Config{
 		AtSign:           s.config.AtSign,
 		Domain:           s.config.RootDomain,
@@ -60,7 +61,7 @@ func (s *AtSecondaryServer) Start() error {
 		Email:            s.config.Email,
 	})
 
-	// Set up secure listener using SecurityGateway
+	// Prepare secure listener with SecurityGateway
 	address := fmt.Sprintf("%s:%d", s.config.ServerHost, s.config.ServerPort)
 	secureListener, err := s.securityGateway.SecureListener(address)
 	if err != nil {
@@ -68,7 +69,7 @@ func (s *AtSecondaryServer) Start() error {
 		return err
 	}
 
-	// Start the server with the secure listener
+	// Run the server in a separate goroutine
 	go func() {
 		if err := s.server.Serve(secureListener); err != nil {
 			s.logger.Error("Error running DESS server:", err)
@@ -79,16 +80,17 @@ func (s *AtSecondaryServer) Start() error {
 	return nil
 }
 
+// Stop gracefully shuts down the DESS atProtocol secondary server
 func (s *AtSecondaryServer) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.logger.Info("Stopping DESS atProtocol secondary server...")
 
-	// Cancel the context to signal all goroutines to terminate
+	// Cancel the context to signal goroutines to terminate
 	s.cancel()
 
-	// Attempt to stop the server gracefully
+	// Attempt to gracefully stop the server
 	if err := s.server.Stop(); err != nil {
 		s.logger.Error("Error stopping DESS atProtocol secondary server:", err)
 		return err
@@ -98,6 +100,7 @@ func (s *AtSecondaryServer) Stop() error {
 	return nil
 }
 
+// validateConfig ensures that the configuration parameters are correct and complete
 func (s *AtSecondaryServer) validateConfig() error {
 	if s.config.AtSign == "" || s.config.RootDomain == "" || s.config.ServerPort == 0 {
 		return fmt.Errorf("missing required configuration parameters")

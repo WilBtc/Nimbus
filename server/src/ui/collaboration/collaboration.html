@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collaborative File Sharing</title>
+  <link rel="stylesheet" href="../dashboard/styles.css"> <!-- Reuse existing CSS styles -->
+</head>
+<body>
+  <header>
+    <h1>Nimbus Collaborative File Sharing</h1>
+  </header>
+
+  <main>
+    <section id="file-upload">
+      <h2>Upload and Collaborate on File</h2>
+      <form id="upload-form">
+        <label for="fileInput">Select File:</label>
+        <input type="file" id="fileInput" name="fileInput" required>
+        <button type="submit">Upload File</button>
+      </form>
+    </section>
+
+    <section id="file-list-section">
+      <h2>Shared Files</h2>
+      <div id="file-list">
+        <!-- Files will be dynamically inserted here -->
+      </div>
+    </section>
+
+    <section id="collaborate-section">
+      <h2>Collaborate on File</h2>
+      <textarea id="fileContent" placeholder="Select a file to edit..."></textarea>
+      <button id="saveBtn" disabled>Save Changes</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Nimbus</p>
+  </footer>
+
+  <script src="collaboration.js"></script>
+</body>
+</html>

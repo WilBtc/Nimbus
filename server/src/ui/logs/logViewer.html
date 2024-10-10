@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Viewer</title>
+  <link rel="stylesheet" href="../dashboard/styles.css"> <!-- Reuse existing CSS styles -->
+</head>
+<body>
+  <header>
+    <h1>Nimbus Log Viewer</h1>
+  </header>
+
+  <main>
+    <section id="filter-section">
+      <h2>Filter Logs</h2>
+      <form id="filter-form">
+        <label for="logLevel">Log Level:</label>
+        <select id="logLevel" name="logLevel">
+          <option value="">All</option>
+          <option value="INFO">INFO</option>
+          <option value="WARN">WARN</option>
+          <option value="ERROR">ERROR</option>
+        </select>
+        
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate">
+        
+        <label for="endDate">End Date:</label>
+        <input type="date" id="endDate" name="endDate">
+
+        <button type="submit">Filter Logs</button>
+      </form>
+    </section>
+
+    <section id="log-viewer">
+      <h2>Log Entries</h2>
+      <div id="log-list">
+        <!-- Logs will be dynamically inserted here -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Nimbus</p>
+  </footer>
+
+  <script src="logViewer.js"></script>
+</body>
+</html>

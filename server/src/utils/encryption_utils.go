@@ -1,5 +1,4 @@
 // server/src/utils/encryption_utils.go
-
 package utils
 
 import (

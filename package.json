@@ -1,0 +1,58 @@
+{
+    "name": "nimbus-server",
+    "version": "1.0.0",
+    "description": "Nimbus Server - Secure and scalable platform for Industrial IoT with device management, file sharing, and real-time data analytics.",
+    "main": "app.js",
+    "scripts": {
+      "start": "node app.js",                    // Script to start the server
+      "test": "mocha --exit",                    // Script to run all the test cases
+      "lint": "eslint .",                        // Script to run the linter
+      "build": "webpack --config webpack.config.js",  // Script to build the front-end assets
+      "dev": "nodemon app.js",                   // Script to start the server in development mode with hot reload
+      "clean": "rm -rf dist && rm -rf storage",  // Script to clean build artifacts and storage
+      "prepare": "npm install"                   // Install dependencies before running any scripts
+    },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/yourusername/nimbus-server.git"
+    },
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+      "express": "^4.17.1",                      // Express.js for handling HTTP requests
+      "body-parser": "^1.19.0",                  // Middleware for handling JSON and form data
+      "hyperswarm": "^3.3.0",                    // Hyperswarm for peer discovery and networking
+      "hypercore": "^10.8.0",                    // Hypercore for immutable data storage
+      "autobase": "^1.2.0",                      // Autobase for multi-writer databases and collaborative file sharing
+      "atsign-auth": "^2.0.0",                   // Atsign authentication for secure interactions
+      "noports": "^1.1.0",                       // NoPorts for secure tunneling without traditional port configurations
+      "log4js": "^6.3.0",                        // Log4js for structured logging
+      "mocha": "^8.4.0",                         // Mocha testing framework
+      "chai": "^4.3.4",                          // Chai assertion library
+      "nodemon": "^2.0.12",                      // Nodemon for automatic server restarts in development
+      "webpack": "^5.47.1",                      // Webpack for bundling front-end assets
+      "eslint": "^7.32.0",                       // ESLint for code linting
+      "lumberjack": "^1.0.0"                     // Lumberjack for rotating log files
+    },
+    "devDependencies": {
+      "chai": "^4.3.4",                          // Chai assertion library (for development and testing)
+      "mocha": "^8.4.0",                         // Mocha testing framework (for development and testing)
+      "eslint": "^7.32.0",                       // ESLint for code linting (development)
+      "webpack-cli": "^4.7.2",                   // Webpack CLI for building front-end assets
+      "nodemon": "^2.0.12"                       // Nodemon for development mode with automatic restarts
+    },
+    "keywords": [
+      "nimbus",
+      "iot",
+      "hyperswarm",
+      "atsign",
+      "noports",
+      "hypercore",
+      "autobase",
+      "device-management",
+      "file-sharing",
+      "data-analytics",
+      "nodejs"
+    ]
+  }
+  
